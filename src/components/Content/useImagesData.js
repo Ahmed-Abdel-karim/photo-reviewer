@@ -6,12 +6,11 @@ import {
   setRejectedImagesToStore,
 } from "../../services/data-store";
 
-const currentAcceptedPhotos = getAcceptedImagesFormStore();
-const currentRejecteddPhotos = getRejectedImagesFormStore();
-
 const useImagesData = () => {
-  const [acceptedImages, setAcceptedImages] = useState(currentAcceptedPhotos);
-  const [rejectedImages, setRejectedImages] = useState(currentRejecteddPhotos);
+  const currentAcceptedImages = getAcceptedImagesFormStore();
+  const currentRejecteddImages = getRejectedImagesFormStore();
+  const [acceptedImages, setAcceptedImages] = useState(currentAcceptedImages);
+  const [rejectedImages, setRejectedImages] = useState(currentRejecteddImages);
 
   const addAcceptedImage = useCallback((img) => {
     setAcceptedImages((imgs) => {

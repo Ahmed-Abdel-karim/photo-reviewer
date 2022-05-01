@@ -4,15 +4,16 @@ import FlexBox from "../../styledComponents/FlexBox";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Button from "../../styledComponents/Button";
 import Typography from "../../styledComponents/Typography";
+import useImagesListData from "./useImagesListData";
 
-const PHOTO_WIDTH = 10;
-const PHOTO_PADDING = 0.5;
+const IMAGE_WIDTH = 10;
+const PADDING = 0.5;
 
 const SLi = styled.li`
   list-style: none;
   display: block;
   height: 100%;
-  width: ${PHOTO_WIDTH}rem;
+  width: ${IMAGE_WIDTH}rem;
   border: 6px solid transparent;
   box-sizing: border-box;
   &.active {
@@ -21,7 +22,7 @@ const SLi = styled.li`
 `;
 
 const SGalleryContainer = styled.div`
-  overflow-x: auto;
+  overflow: hidden;
   max-width: 100%;
   &::-webkit-scrollbar {
     display: none;
@@ -58,43 +59,29 @@ const SImageContainer = styled.button`
 `;
 
 const ImagesList = ({ images }) => {
-  const [activeIndex, setActive] = useState("0");
-  const imagesNumber = Object.values(images).length;
-  const sliderWidth = (PHOTO_WIDTH + PHOTO_PADDING) * imagesNumber;
-  const listRef = useRef(null);
-
-  const handleImageClick = useCallback((e) => {
-    const imageIndex = e.target.getAttribute("data-index");
-    setActive(imageIndex);
-  }, []);
-
-  const handleNext = useCallback(() => {
-    setActive((p) => (Number(p) < imagesNumber - 1 ? Number(p) + 1 : 0));
-  }, [imagesNumber]);
-
-  const handlePrev = useCallback(() => {
-    setActive((p) => (Number(p) > 0 ? Number(p) - 1 : imagesNumber - 1));
-  }, [imagesNumber]);
-
-  // move element to viewport when selected
-  useEffect(() => {
-    const currentElement = listRef.current?.getElementsByClassName("active")[0];
-    currentElement?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center",
-    });
-  }, [listRef, activeIndex]);
-
-  useEffect(() => {
-    setActive("0");
-  }, [imagesNumber]);
+  const {
+    handleImageClick,
+    handleNext,
+    handlePrev,
+    sliderWidth,
+    listRef,
+    imagesNumber,
+    activeIndex,
+  } = useImagesListData({
+    images,
+    imageWidth: IMAGE_WIDTH,
+    padding: PADDING,
+  });
 
   return (
-    <SContainer>
+    <>
       {imagesNumber ? (
-        <>
-          <SIconContainer onClick={handlePrev} direction="left">
+        <SContainer data-testid="images-list">
+          <SIconContainer
+            aria-label="prevoius image"
+            onClick={handlePrev}
+            direction="left"
+          >
             <IoIosArrowBack fontSize="2.5rem" />
           </SIconContainer>
           <SGalleryContainer>
@@ -109,6 +96,7 @@ const ImagesList = ({ images }) => {
                 return (
                   <SLi
                     key={image.id}
+                    id={image.id}
                     className={
                       String(activeIndex) === String(index) ? "active" : ""
                     }
@@ -128,16 +116,20 @@ const ImagesList = ({ images }) => {
               })}
             </FlexBox>
           </SGalleryContainer>
-          <SIconContainer onClick={handleNext} direction="right">
+          <SIconContainer
+            aria-label="next image"
+            onClick={handleNext}
+            direction="right"
+          >
             <IoIosArrowForward fontSize="2.5rem" />
           </SIconContainer>
-        </>
+        </SContainer>
       ) : (
-        <FlexBox bg="#f8f8f8" height="9rem">
-          <Typography>No AcceptedImages To Display</Typography>
+        <FlexBox m="0 0 2rem 0" width="100%" bg="#f8f8f8" height="9rem">
+          <Typography>No Accepted Images To Display</Typography>
         </FlexBox>
       )}
-    </SContainer>
+    </>
   );
 };
 

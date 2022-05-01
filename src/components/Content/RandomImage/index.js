@@ -20,6 +20,7 @@ const RandomImage = ({ onAcceptImage, omittedImages, onRejectImage }) => {
     image,
     isLoading,
     isSelecting,
+    error,
   } = useRandomImageData({ onAcceptImage, omittedImages, onRejectImage });
 
   return (
@@ -37,10 +38,12 @@ const RandomImage = ({ onAcceptImage, omittedImages, onRejectImage }) => {
           <SImg
             src={image.urls.small}
             alt={image.alt_description || image.id}
+            aria-label="presented image"
           />
         )}
         {!image && !isLoading && <Typography>No Image To Display</Typography>}
-        {isLoading && <Typography>Loading</Typography>}
+        {isLoading && <Typography role="alert">Loading</Typography>}
+        {error && <Typography role="alert">{error}</Typography>}
       </FlexBox>
       <FlexBox>
         <Button
@@ -48,6 +51,7 @@ const RandomImage = ({ onAcceptImage, omittedImages, onRejectImage }) => {
           color="secondary"
           disabled={!image || !isSelecting}
           onClick={handleAcceptImage}
+          aria-label="accept image"
         >
           <FaCheck fontSize="1rem" />
         </Button>
@@ -55,6 +59,7 @@ const RandomImage = ({ onAcceptImage, omittedImages, onRejectImage }) => {
           disabled={!isSelecting || isLoading}
           color="error"
           onClick={handleRejectImage}
+          aria-label="reject image"
         >
           <FaTimes fontSize="1rem" />
         </Button>

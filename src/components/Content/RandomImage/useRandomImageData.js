@@ -1,4 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
+import {
+  getCurrentDisplayedImageFormStore,
+  setCurrentDisplayedImageToStore,
+} from "../../../services/data-store";
 import { getRandomImage } from "../../../services/photos-service";
 
 const useRandomImageData = ({
@@ -6,27 +10,48 @@ const useRandomImageData = ({
   onRejectImage,
   omittedImages,
 }) => {
-  const [{ isLoading, image }, setImageData] = useState({
+  const [{ isLoading, image, error }, setImageData] = useState({
     isLoading: false,
   });
 
   const [isSelecting, setIsSelecting] = useState(false);
 
+  // set persisted data on initial load
+  useLayoutEffect(() => {
+    const storedPhoto = getCurrentDisplayedImageFormStore();
+    if (storedPhoto) {
+      setIsSelecting(true);
+      setImageData({
+        isLoading: false,
+        image: storedPhoto,
+      });
+    }
+  }, []);
+
   const handleGetNewImage = useCallback(() => {
     setImageData({
       isLoading: true,
     });
-    getRandomImage(omittedImages).then((image) => {
-      setImageData({
-        isLoading: false,
-        image,
+    getRandomImage(omittedImages)
+      .then((image) => {
+        setCurrentDisplayedImageToStore(image);
+        setImageData({
+          isLoading: false,
+          image,
+        });
+      })
+      .catch((e) => {
+        setImageData({
+          isLoading: false,
+          error: e.message,
+        });
       });
-    });
   }, [omittedImages]);
 
   const handleAcceptImage = useCallback(() => {
     onAcceptImage(image);
     setIsSelecting(false);
+    setCurrentDisplayedImageToStore();
     setImageData({
       isLoading: false,
     });
@@ -49,6 +74,7 @@ const useRandomImageData = ({
     isSelecting,
     isLoading,
     image,
+    error,
   };
 };
 
