@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import FlexBox from "../../styledComponents/FlexBox";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
